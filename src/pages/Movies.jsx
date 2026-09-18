@@ -85,7 +85,7 @@ function Movies() {
       {/* card sections with search */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-2 mb-4">
         <div className="flex flex-col md:flex-row justify-between items-center gap-2 mb-2">
-          <div className="w-2xl flex items-center gap-2 border border-gray-300 px-4 rounded-xl ">
+          <div className="w-full lg:w-2xl flex items-center gap-2 border border-gray-300 px-4 rounded-xl ">
             <label
               htmlFor="search"
               className="w-10 h-10 hover:bg-gray-200 flex justify-center items-center rounded-full transition-all"
