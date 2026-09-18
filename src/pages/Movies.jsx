@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { LuSearch } from "react-icons/lu";
 import MoviesCards from "../components/MoviesCards";
 import MovieTopText from "../components/MovieTopText";
+import { BsSearch } from "react-icons/bs";
 
 function Movies() {
   const [movies, setMovies] = useState([]);
@@ -9,17 +10,52 @@ function Movies() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
 
+  // useEffect(() => {
+  //   const fetchMoviesData = async () => {
+  //     try {
+  //       const res = await fetch("https://api.tvmaze.com/shows");
+
+  //       if (!res.ok) {
+  //         throw new Error(res.message || "Somethig went wrong");
+  //       }
+
+  //       const data = await res.json();
+  //       setMovies(data);
+  //     } catch (err) {
+  //       setError(err.message);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
+
+  //   fetchMoviesData();
+  // }, []);
+
   useEffect(() => {
     const fetchMoviesData = async () => {
       try {
-        const res = await fetch("https://api.tvmaze.com/shows");
+        // setIsLoading(true);
+        setError("");
+
+        let url = "https://api.tvmaze.com/shows";
+
+        if (searchText.trim()) {
+          url = `https://api.tvmaze.com/search/shows?q=${searchText}`;
+        }
+
+        const res = await fetch(url);
 
         if (!res.ok) {
-          throw new Error(res.message || "Somethig went wrong");
+          throw new Error("Something went wrong");
         }
 
         const data = await res.json();
-        setMovies(data);
+
+        if (searchText.trim()) {
+          setMovies(data.map((item) => item.show));
+        } else {
+          setMovies(data);
+        }
       } catch (err) {
         setError(err.message);
       } finally {
@@ -28,10 +64,14 @@ function Movies() {
     };
 
     fetchMoviesData();
-  }, []);
+  }, [searchText]);
 
   if (isLoading) {
-    return <p className="text-lg text-green-400">Data is Loading....</p>;
+    return (
+      <p className="text-lg text-green-400 text-center mt-4">
+        Data is Loading....
+      </p>
+    );
   }
 
   if (error) {
@@ -39,12 +79,8 @@ function Movies() {
   }
   // console.log(movies);
 
-  const filteredMovies = movies.filter((movie) =>
-    movie.name.toLowerCase().includes(searchText.toLowerCase()),
-  );
-
   return (
-    <div className="w-full">
+    <div className="w-full ">
       <MovieTopText />
       {/* card sections with search */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-2 mb-4">
@@ -76,45 +112,44 @@ function Movies() {
           <p className="text-lg text-gray-600 my-2 font-bold">
             {movies.length} Shows
           </p>
-          <div>
-            {filteredMovies.length > 0 ? (
-              <div className="grid grid-cols-1 justify-items-center gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {filteredMovies.map((movie) => (
-                  <MoviesCards
-                    key={movie.id}
-                    image={movie.image.medium}
-                    image2={movie.image.original}
-                    name={movie.name}
-                    rating={movie.rating.average}
-                    year={movie.premiered}
-                    summary={movie.summary}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="py-16 text-center">
-                <h2 className="text-2xl font-bold text-gray-700">
-                  No movies found
-                </h2>
 
-                <p className="mt-2 text-gray-500">
-                  Try searching with another movie title.
+          {movies.length === 0 ? (
+            <div>
+              <div className="flex flex-col justify-center items-center h-40">
+                <BsSearch className="text-3xl" />
+                <p className="text-2xl font-bold text-red-500">
+                  No movie found
                 </p>
               </div>
-            )}
-
-            {/* {movies.map((movie) => (
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 justify-items-center gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {movies.map((movie) => (
+                <MoviesCards
+                  key={movie.id}
+                  image={movie.image?.medium}
+                  image2={movie.image?.original}
+                  name={movie.name}
+                  rating={movie.rating?.average}
+                  year={movie.premiered}
+                  summary={movie.summary}
+                />
+              ))}
+            </div>
+          )}
+          {/* <div className="grid grid-cols-1 justify-items-center gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {movies.map((movie) => (
               <MoviesCards
                 key={movie.id}
-                image={movie.image.medium}
-                image2={movie.image.original}
+                image={movie.image?.medium}
+                image2={movie.image?.original}
                 name={movie.name}
-                rating={movie.rating.average}
+                rating={movie.rating?.average}
                 year={movie.premiered}
                 summary={movie.summary}
               />
-            ))} */}
-          </div>
+            ))}
+          </div> */}
         </div>
       </div>
     </div>
